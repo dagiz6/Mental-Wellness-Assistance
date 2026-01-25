@@ -10,17 +10,17 @@ export default function About() {
           {/* Header */}
           <div className="mb-12">
             <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-4 flex items-center gap-4">
-              <span className="text-4xl">🕉️</span>
-              <span className="text-balance">About Vihaara</span>
+              <span className="text-4xl "><img src="icon.svg" alt="" className='w-12' /></span>
+              <span className="text-balance">About MindMate</span>
             </h1>
           </div>
 
           {/* Introduction */}
           <div className="mb-12">
             <p className="text-lg leading-relaxed text-muted-foreground mb-6 text-balance">
-              Vihaara — derived from Sanskrit, meaning lifestyle or mindful dwelling — is your personal
-              sanctuary for mental clarity and emotional well-being. Inspired by ancient concepts of balance and
-              modern intelligence, Vihaara blends the wisdom of mindful living with the power of advanced AI.
+              MindMate — is your personal sanctuary for mental clarity and emotional well-being.
+              Inspired by ancient concepts of balance and modern intelligence, MindMate blends the
+              wisdom of mindful living with the power of advanced AI.
             </p>
           </div>
 
@@ -34,7 +34,7 @@ export default function About() {
               </p>
               <p className="text-lg leading-relaxed text-balance">
                 Whether you're journaling your thoughts, checking in on your mood, or seeking health and wellness tips,
-                Vihaara is designed to meet you with calm, insight, and compassion — every single day.
+                MindMate is designed to meet you with calm, insight, and compassion — every single day.
               </p>
             </div>
           </div>
@@ -83,7 +83,7 @@ export default function About() {
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-1 h-8 bg-primary rounded"></div>
-              <h2 className="text-3xl font-bold text-foreground">How Vihaara Works</h2>
+              <h2 className="text-3xl font-bold text-foreground">How MindMate Works</h2>
             </div>
 
             <div className="space-y-6">
@@ -95,7 +95,7 @@ export default function About() {
                 <div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">Journal Your Thoughts</h3>
                   <p className="text-muted-foreground">
-                    Write down your feelings and experiences. Vihaara's AI will analyze the emotions and provide insights.
+                    Write down your feelings and experiences. MindMate's AI will analyze the emotions and provide insights.
                   </p>
                 </div>
               </div>

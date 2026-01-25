@@ -8,7 +8,7 @@ export default function Home() {
       <section className="px-6 pt-12 pb-8 md:pt-16 md:pb-12">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-3 text-balance">
-            Welcome to Vihaara
+            Welcome to MindMate
           </h1>
           <p className="text-lg text-muted-foreground mb-8 text-balance">
             Your sanctuary for mental clarity and emotional well-being

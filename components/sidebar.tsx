@@ -70,7 +70,7 @@ export default function Sidebar() {
             ☸
           </div>
           <span className="text-xl font-semibold text-sidebar-foreground">
-            Vihaara
+            MindMate
           </span>
         </Link>
 

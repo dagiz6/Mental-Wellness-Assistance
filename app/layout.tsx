@@ -10,9 +10,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Vihaara - Mental Wellness Chat Assistance',
+  title: 'MindMate - Mental Wellness Chat Assistance',
   description: 'Your sanctuary for mental clarity and emotional well-being',
-  generator: 'v0.app',
   viewport: {
     width: 'device-width',
     initialScale: 1,

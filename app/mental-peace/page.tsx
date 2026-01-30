@@ -10,6 +10,7 @@ export default async function HomePage() {
 
       if (!session) {
         redirect("/auth");
-      }
+  }
+  
   return <MentalPeacePage />;
 }

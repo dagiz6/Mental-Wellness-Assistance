@@ -6,7 +6,7 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="px-6 pt-12 pb-8 md:pt-16 md:pb-12">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto ">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-3 text-balance">
             Welcome to MindMate
           </h1>

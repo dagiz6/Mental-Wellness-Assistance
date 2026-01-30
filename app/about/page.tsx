@@ -2,7 +2,10 @@
 
 import { Lock, Zap, BookOpen, Activity, MessageCircle, Gift } from 'lucide-react';
 
+
 export default function About() {
+
+  
   return (
     <div className="min-h-screen bg-background">
       <section className="px-6 py-12 md:py-16">

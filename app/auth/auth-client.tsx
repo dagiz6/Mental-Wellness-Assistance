@@ -1,8 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { signIn, signUp } from "@/lib/actions/auth-actions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Loader2 } from "lucide-react";
+import Link from "next/link";
 
 export default function AuthClientPage() {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -12,9 +26,6 @@ export default function AuthClientPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // Get callback URL from search params (set by middleware)
 
   const handleSocialAuth = async (provider: "google" | "github") => {
     setIsLoading(true);
@@ -22,11 +33,12 @@ export default function AuthClientPage() {
 
     try {
       console.log("Logged in with", provider);
+      // Implement actual social auth logic here
     } catch (err) {
       setError(
         `Error authenticating with ${provider}: ${
           err instanceof Error ? err.message : "Unknown error"
-        }`
+        }`,
       );
     } finally {
       setIsLoading(false);
@@ -41,20 +53,23 @@ export default function AuthClientPage() {
     try {
       if (isSignIn) {
         const result = await signIn(email, password);
-        if (!result.user) {
+        if (!result?.user) {
+          // Check if there is an error in the result, otherwise generic error
+          // Note: The original code assumed !result.user meant error.
+          // You might want to check result.error if your auth action returns it.
           setError("Invalid email or password.");
         }
       } else {
-                const result = await signUp(email, password , name);
-                if (!result.user) {
-                  setError("failed to create account.");
-                }
+        const result = await signUp(email, password, name);
+        if (!result?.user) {
+          setError("Failed to create account.");
+        }
       }
     } catch (err) {
       setError(
         `Authentication error: ${
           err instanceof Error ? err.message : "Unknown error"
-        }`
+        }`,
       );
     } finally {
       setIsLoading(false);
@@ -62,52 +77,28 @@ export default function AuthClientPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="flex items-center justify-center p-4 pt-20">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {isSignIn ? "Welcome Back" : "Create Account"}
-            </h1>
-            <p className="text-gray-600">
-              {isSignIn
-                ? "Sign in to your account to continue"
-                : "Sign up to get started with better-auth"}
-            </p>
-          </div>
-
-          {/* Error Display */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-red-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-800">{error}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Social Authentication */}
-          <div className="space-y-3">
-            <button
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">
+            {isSignIn ? "Welcome Back" : "Create Account"}
+          </CardTitle>
+          <CardDescription>
+            {isSignIn
+              ? "Enter your credentials to sign in to your account"
+              : "Enter your information to create an account"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Social Auth Buttons */}
+          <div className="grid grid-cols-2 gap-4">
+            <Button
+              variant="outline"
               onClick={() => handleSocialAuth("google")}
               disabled={isLoading}
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full"
             >
-              <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -125,16 +116,16 @@ export default function AuthClientPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Continue with Google
-            </button>
-
-            <button
+              Google
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => handleSocialAuth("github")}
               disabled={isLoading}
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-gray-900 text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full"
             >
               <svg
-                className="w-5 h-5 mr-3"
+                className="w-4 h-4 mr-2"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -144,140 +135,91 @@ export default function AuthClientPage() {
                   clipRule="evenodd"
                 />
               </svg>
-              Continue with GitHub
-            </button>
+              GitHub
+            </Button>
           </div>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
+              <span className="w-full border-t" />
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-500">
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
                 Or continue with
               </span>
             </div>
           </div>
 
-          {/* Email/Password Form */}
           <form onSubmit={handleEmailAuth} className="space-y-4">
-            {!isSignIn && (
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Full Name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  required={!isSignIn}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                  placeholder="Enter your full name"
-                />
+            {/* Error Display */}
+            {error && (
+              <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md">
+                {error}
               </div>
             )}
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Email address
-              </label>
-              <input
+            {!isSignIn && (
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required={!isSignIn}
+                  disabled={isLoading}
+                />
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
                 id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
+                placeholder="m@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                placeholder="Enter your email"
+                required
+                disabled={isLoading}
               />
             </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Password
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
                 id="password"
-                name="password"
                 type="password"
-                autoComplete={isSignIn ? "current-password" : "new-password"}
-                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                placeholder="Enter your password"
+                required
+                disabled={isLoading}
+                placeholder="••••••••"
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-            >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  {isSignIn ? "Signing in..." : "Creating account..."}
-                </div>
-              ) : isSignIn ? (
-                "Sign In"
-              ) : (
-                "Create Account"
-              )}
-            </button>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isSignIn ? "Sign In" : "Create Account"}
+            </Button>
           </form>
-
-          {/* Toggle between Sign In and Sign Up */}
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setIsSignIn(!isSignIn);
-                setError(""); // Clear any previous errors
-                setName(""); // Clear name when switching modes
-              }}
-              className="text-indigo-600 hover:text-indigo-500 text-sm font-medium transition-colors"
-            >
-              {isSignIn
-                ? "Don't have an account? Sign up"
-                : "Already have an account? Sign in"}
-            </button>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+        <CardFooter className="justify-center">
+          <Button
+            variant="link"
+            size="sm"
+            onClick={() => {
+              setIsSignIn(!isSignIn);
+              setError("");
+              setName("");
+            }}
+            className="text-muted-foreground"
+          >
+            {isSignIn
+              ? "Don't have an account? Sign up"
+              : "Already have an account? Sign in"}
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

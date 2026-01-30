@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { signOut } from "@/lib/actions/auth-actions";
 import { Button } from "@/components/ui/button"; // If you're using shadcn/ui
 import { Settings, LogOut, User } from "lucide-react";
 
@@ -10,6 +11,7 @@ type Session = typeof auth.$Infer.Session;
 
 export default function Navigation({ session }: { session: Session | null }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const isActive = (path: string) => {
     return pathname === path;
@@ -77,9 +79,9 @@ export default function Navigation({ session }: { session: Session | null }) {
                 variant="ghost"
                 size="sm"
                 className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
-                onClick={() => {
-                  // Handle logout here
-                  console.log("Logout clicked");
+                onClick={async () => {
+                  await signOut();
+                  router.push("/auth");
                 }}
                 title="Sign Out"
               >

@@ -17,6 +17,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { signInSocial } from "@/lib/actions/auth-actions";
 
 export default function AuthClientPage() {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -32,8 +33,7 @@ export default function AuthClientPage() {
     setError("");
 
     try {
-      console.log("Logged in with", provider);
-      // Implement actual social auth logic here
+      await signInSocial(provider);
     } catch (err) {
       setError(
         `Error authenticating with ${provider}: ${

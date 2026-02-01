@@ -25,9 +25,23 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  journalEntries JournalEntry[]
 
   @@unique([email])
   @@map("user")
+}
+
+model JournalEntry {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@map("journal_entry")
 }
 
 model Session {

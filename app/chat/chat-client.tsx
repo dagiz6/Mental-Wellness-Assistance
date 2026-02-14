@@ -22,6 +22,7 @@ export default function ChatClient() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -33,7 +34,7 @@ export default function ChatClient() {
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -43,31 +44,65 @@ export default function ChatClient() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input;
     setInput("");
     setIsLoading(true);
 
-    // Simulate API call - replace with actual AI API
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: currentInput,
+          sessionId: sessionId,
+        }),
+      });
+
+      const contentType = response.headers.get("content-type");
+      let data;
+
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        console.error("Non-JSON response:", text);
+        throw new Error(
+          `Server returned an error (${response.status}). Please check server logs.`,
+        );
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || `Error ${response.status}: Something went wrong`,
+        );
+      }
+
+      if (data.sessionId) {
+        setSessionId(data.sessionId);
+      }
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: generateWellnessResponse(input),
+        content: data.reply,
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, assistantMessage]);
-      setIsLoading(false);
-    }, 800);
-  };
 
-  const generateWellnessResponse = (userInput: string): string => {
-    const responses = [
-      "That's an important feeling to acknowledge. Would you like to talk more about what's been on your mind?",
-      "I appreciate you sharing that with me. Remember that taking care of yourself is a priority. What would help you feel better right now?",
-      "It sounds like you're going through something meaningful. You're doing great by reaching out. What's one thing you could do today for yourself?",
-      "Thank you for trusting me with this. Your well-being matters. Would some breathing exercises or meditation help you right now?",
-      "That takes courage to express. I'm here to support you. What's one positive thing you experienced today?",
-    ];
-    return responses[Math.floor(Math.random() * responses.length)];
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error: any) {
+      console.error("Chat Error:", error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: `Error: ${error.message || "I'm having trouble connecting right now. Please try again in a moment."}`,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleNewChat = () => {
@@ -81,6 +116,7 @@ export default function ChatClient() {
       },
     ]);
     setInput("");
+    setSessionId(null);
   };
 
   return (

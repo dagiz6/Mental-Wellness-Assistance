@@ -54,30 +54,7 @@ async function detectLanguage(text: string): Promise<"am" | "en"> {
   }
 }
 
-async function translateText(
-  text: string,
-  targetLang: "am" | "en",
-): Promise<string> {
-  try {
-    const systemPrompt =
-      targetLang === "en"
-        ? "Translate the following Amharic text to English. Maintain the emotional tone."
-        : "Translate the following English text to Amharic. Maintain the emotional tone and use natural sounding Amharic (Geez script).";
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: text },
-      ],
-      model: "llama-3.1-8b-instant",
-    });
-
-    return completion.choices[0]?.message?.content?.trim() || text;
-  } catch (error) {
-    console.error("Translation Error:", error);
-    return text;
-  }
-}
 
 export async function POST(req: Request) {
   try {
@@ -138,44 +115,80 @@ export async function POST(req: Request) {
 
     // 2. Language Detection
     const lang = await detectLanguage(message);
-    let processedMessage = message;
+    let assistantReply = "";
 
-    // 3. Translate if Amharic
     if (lang === "am") {
-      processedMessage = await translateText(message, "en");
-    }
+      // 3a. Addis Assistant Chat Completion (Direct Amharic)
+      const apiKey = process.env.ADDIS_API_KEY;
+      if (!apiKey) {
+        return NextResponse.json({ error: "ADDIS_API_KEY is not set" }, { status: 500 });
+      }
 
-    // 4. Groq Chat Completion
-    const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
+      let history: any[] = [];
+      if (sessionId) {
+        const pastMessages = await prisma.chatMessage.findMany({
+          where: { sessionId },
+          orderBy: { createdAt: "asc" },
+          take: 10,
+        });
+        for (const msg of pastMessages) {
+          history.push({
+            role: msg.role === "assistant" ? "assistant" : "user",
+            content: msg.content,
+          });
+        }
+      }
 
-    if (sessionId) {
-      const pastMessages = await prisma.chatMessage.findMany({
-        where: { sessionId },
-        orderBy: { createdAt: "asc" },
-        take: 10, // Fetch last 10 messages (5 exchanges)
+      const promptWithSystem = `[System Instructions]\n${SYSTEM_PROMPT}\n\n[User Message]\n${message}`;
+
+      const response = await fetch("https://api.addisassistant.com/api/v1/chat_generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": apiKey,
+        },
+        body: JSON.stringify({
+          prompt: promptWithSystem,
+          target_language: "am",
+          conversation_history: history,
+          generation_config: { temperature: 0.5 }
+        }),
       });
 
-      for (const msg of pastMessages) {
-        messages.push({
-          role: msg.role === "assistant" ? "assistant" : "user",
-          content: msg.content,
-        });
+      if (!response.ok) {
+        throw new Error(`Addis API Error: ${response.status}`);
       }
-    }
 
-    messages.push({ role: "user", content: processedMessage });
+      const returnData = await response.json();
+      assistantReply = (returnData.data?.response_text || returnData.response_text)?.trim() || "I'm sorry, I couldn't process that.";
+    } else {
+      // 3b. Groq Chat Completion (English)
+      const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
 
-    const completion = await groq.chat.completions.create({
-      messages: messages,
-      model: "llama-3.1-8b-instant",
-    });
+      if (sessionId) {
+        const pastMessages = await prisma.chatMessage.findMany({
+          where: { sessionId },
+          orderBy: { createdAt: "asc" },
+          take: 10, // Fetch last 10 messages (5 exchanges)
+        });
 
-    let assistantReply =
-      completion.choices[0]?.message?.content || "I'm sorry, I couldn't process that.";
+        for (const msg of pastMessages) {
+          messages.push({
+            role: msg.role === "assistant" ? "assistant" : "user",
+            content: msg.content,
+          });
+        }
+      }
 
-    // 5. Translate back if original was Amharic
-    if (lang === "am") {
-      assistantReply = await translateText(assistantReply, "am");
+      messages.push({ role: "user", content: message });
+
+      const completion = await groq.chat.completions.create({
+        messages: messages,
+        model: "llama-3.1-8b-instant",
+      });
+
+      assistantReply =
+        completion.choices[0]?.message?.content || "I'm sorry, I couldn't process that.";
     }
 
     // 6. DB Storage

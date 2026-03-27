@@ -6,12 +6,14 @@ import { auth } from "@/lib/auth";
 import { signOut } from "@/lib/actions/auth-actions";
 import { Button } from "@/components/ui/button"; // If you're using shadcn/ui
 import { Settings, LogOut, User } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type Session = typeof auth.$Infer.Session;
 
 export default function Navigation({ session }: { session: Session | null }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLanguage();
 
   const isActive = (path: string) => {
     return pathname === path;
@@ -23,13 +25,13 @@ export default function Navigation({ session }: { session: Session | null }) {
         {/* Mobile: Centered Logo */}
         <div className="md:hidden flex-1 flex justify-center">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold text-foreground">MindMate</span>
+            <span className="text-xl font-bold text-foreground">{t("nav", "mindMate")}</span>
           </Link>
         </div>
 
         {/* Desktop: Left Logo */}
         <Link href="/" className="hidden md:flex items-center space-x-2">
-          <span className="text-xl font-bold text-foreground">MindMate</span>
+          <span className="text-xl font-bold text-foreground">{t("nav", "mindMate")}</span>
         </Link>
 
         {/* Navigation Links */}
@@ -43,12 +45,12 @@ export default function Navigation({ session }: { session: Session | null }) {
                 className="hidden sm:inline-flex"
                 size="sm"
               >
-                <Link href="/auth">Sign In</Link>
+                <Link href="/auth">{t("nav", "signIn")}</Link>
               </Button>
 
               {/* Get Started Button */}
               <Button asChild size="sm">
-                <Link href="/auth?mode=signup">Get Started</Link>
+                <Link href="/auth?mode=signup">{t("nav", "getStarted")}</Link>
               </Button>
             </>
           ) : (
@@ -86,7 +88,7 @@ export default function Navigation({ session }: { session: Session | null }) {
                 title="Sign Out"
               >
                 <LogOut size={16} />
-                <span className="hidden sm:inline">Logout</span>
+                <span className="hidden sm:inline">{t("nav", "logout")}</span>
               </Button>
             </div>
           )}

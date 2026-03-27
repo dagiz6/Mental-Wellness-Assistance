@@ -1,11 +1,11 @@
 'use client';
 
 import { Lock, Zap, BookOpen, Activity, MessageCircle, Gift } from 'lucide-react';
-
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function About() {
+  const { t } = useLanguage();
 
-  
   return (
     <div className="min-h-screen bg-background">
       <section className="px-6 py-12 md:py-16">
@@ -14,30 +14,26 @@ export default function About() {
           <div className="mb-12">
             <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-4 flex items-center gap-4">
               <span className="text-4xl "><img src="icon.svg" alt="" className='w-12' /></span>
-              <span className="text-balance">About MindMate</span>
+              <span className="text-balance">{t('about', 'title')}</span>
             </h1>
           </div>
 
           {/* Introduction */}
           <div className="mb-12">
             <p className="text-lg leading-relaxed text-muted-foreground mb-6 text-balance">
-              MindMate — is your personal sanctuary for mental clarity and emotional well-being.
-              Inspired by ancient concepts of balance and modern intelligence, MindMate blends the
-              wisdom of mindful living with the power of advanced AI.
+              {t('about', 'intro')}
             </p>
           </div>
 
           {/* Our Mission */}
           <div className="mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-6">Our Mission</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-6">{t('about', 'missionTitle')}</h2>
             <div className="space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed text-balance">
-                Our mission is simple: To provide a private, intelligent, and comforting space for daily self-care, reflection, and
-                emotional support — without judgment, tracking, or cloud storage.
+                {t('about', 'mission1')}
               </p>
               <p className="text-lg leading-relaxed text-balance">
-                Whether you're journaling your thoughts, checking in on your mood, or seeking health and wellness tips,
-                MindMate is designed to meet you with calm, insight, and compassion — every single day.
+                {t('about', 'mission2')}
               </p>
             </div>
           </div>
@@ -51,9 +47,9 @@ export default function About() {
                   <Lock size={24} className="text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">Privacy First</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">{t('about', 'privacyTitle')}</h3>
                   <p className="text-muted-foreground">
-                    All your data stays on your device. Nothing is sent to the cloud.
+                    {t('about', 'privacyDesc')}
                   </p>
                 </div>
               </div>
@@ -66,9 +62,9 @@ export default function About() {
                   <Zap size={24} className="text-accent" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">AI-Powered Insights</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">{t('about', 'aiTitle')}</h3>
                   <p className="text-muted-foreground">
-                    Advanced AI helps you understand patterns and provides personalized guidance.
+                    {t('about', 'aiDesc')}
                   </p>
                 </div>
               </div>
@@ -78,7 +74,7 @@ export default function About() {
           {/* Tagline */}
           <div className="text-center mb-16 py-8">
             <p className="text-2xl italic text-primary font-light">
-              "Live gently. Think clearly. Feel deeply."
+              {t('about', 'tagline')}
             </p>
           </div>
 
@@ -86,7 +82,7 @@ export default function About() {
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-1 h-8 bg-primary rounded"></div>
-              <h2 className="text-3xl font-bold text-foreground">How MindMate Works</h2>
+              <h2 className="text-3xl font-bold text-foreground">{t('about', 'worksTitle')}</h2>
             </div>
 
             <div className="space-y-6">
@@ -96,9 +92,9 @@ export default function About() {
                   1
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">Journal Your Thoughts</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">{t('about', 'step1Title')}</h3>
                   <p className="text-muted-foreground">
-                    Write down your feelings and experiences. MindMate's AI will analyze the emotions and provide insights.
+                    {t('about', 'step1Desc')}
                   </p>
                 </div>
               </div>
@@ -109,9 +105,9 @@ export default function About() {
                   2
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">Track Your Mood</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">{t('about', 'step2Title')}</h3>
                   <p className="text-muted-foreground">
-                    Log your daily mood with simple selections. Discover patterns over time.
+                    {t('about', 'step2Desc')}
                   </p>
                 </div>
               </div>
@@ -122,9 +118,9 @@ export default function About() {
                   3
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">Chat with Your AI</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">{t('about', 'step3Title')}</h3>
                   <p className="text-muted-foreground">
-                    Have supportive conversations with Vihaara's AI assistant for guidance and mental wellness tips.
+                    {t('about', 'step3Desc')}
                   </p>
                 </div>
               </div>
@@ -135,9 +131,9 @@ export default function About() {
                   4
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">Receive Daily Tips</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">{t('about', 'step4Title')}</h3>
                   <p className="text-muted-foreground">
-                    Get personalized wellness suggestions based on your mood patterns and journal content.
+                    {t('about', 'step4Desc')}
                   </p>
                 </div>
               </div>
@@ -149,10 +145,9 @@ export default function About() {
             <div className="flex justify-center mb-4">
               <Lock size={32} className="text-primary" />
             </div>
-            <h3 className="text-2xl font-bold text-foreground mb-3">Privacy Commitment</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-3">{t('about', 'commitmentTitle')}</h3>
             <p className="text-muted-foreground text-lg">
-              Your mental wellness journey is deeply personal. We're committed to protecting your privacy and ensuring your data
-              remains yours alone—always stored locally, never shared, and completely secure.
+              {t('about', 'commitmentDesc')}
             </p>
           </div>
         </div>

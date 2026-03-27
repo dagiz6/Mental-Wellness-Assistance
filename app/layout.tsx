@@ -8,6 +8,7 @@ import "./globals.css";
 import Navigation from "@/components/Navigation";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -51,9 +52,11 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`font-sans antialiased bg-background text-foreground`}>
-        <Navigation session={session} />
-        <AppLayout session={session}>{children}</AppLayout>
-        <Analytics />
+        <LanguageProvider>
+          <Navigation session={session} />
+          <AppLayout session={session}>{children}</AppLayout>
+          <Analytics />
+        </LanguageProvider>
       </body>
     </html>
   );

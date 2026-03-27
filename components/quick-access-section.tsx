@@ -2,41 +2,44 @@
 
 import Link from 'next/link';
 import { BookOpen, MessageCircle, Flower2 } from 'lucide-react';
-
-const quickAccessItems = [
-  {
-    title: 'Journal',
-    description: 'Reflect and get AI insights',
-    href: '/journal',
-    icon: BookOpen,
-    bgColor: 'from-purple-500/20 to-purple-600/20',
-    iconColor: '#a855f7',
-  },
-  {
-    title: 'AI Chat',
-    description: 'Talk to your wellness AI',
-    href: '/chat',
-    icon: MessageCircle,
-    bgColor: 'from-blue-500/20 to-blue-600/20',
-    iconColor: '#3b82f6',
-  },
-  {
-    title: 'Mental Peace',
-    description: 'Inner calm techniques',
-    href: '/mental-peace',
-    icon: Flower2,
-    bgColor: 'from-cyan-500/20 to-cyan-600/20',
-    iconColor: '#06b6d4',
-  },
-];
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function QuickAccessSection() {
+  const { t } = useLanguage();
+
+  const quickAccessItems = [
+    {
+      title: t('quickAccess', 'journalTitle'),
+      description: t('quickAccess', 'journalDesc'),
+      href: '/journal',
+      icon: BookOpen,
+      bgColor: 'from-purple-500/20 to-purple-600/20',
+      iconColor: '#a855f7',
+    },
+    {
+      title: t('quickAccess', 'chatTitle'),
+      description: t('quickAccess', 'chatDesc'),
+      href: '/chat',
+      icon: MessageCircle,
+      bgColor: 'from-blue-500/20 to-blue-600/20',
+      iconColor: '#3b82f6',
+    },
+    {
+      title: t('quickAccess', 'peaceTitle'),
+      description: t('quickAccess', 'peaceDesc'),
+      href: '/mental-peace',
+      icon: Flower2,
+      bgColor: 'from-cyan-500/20 to-cyan-600/20',
+      iconColor: '#06b6d4',
+    },
+  ];
+
   return (
     <section className="mb-8">
       {/* Section Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="w-1 h-6 bg-primary rounded"></div>
-        <h2 className="text-2xl font-semibold text-foreground">Quick Access</h2>
+        <h2 className="text-2xl font-semibold text-foreground">{t('quickAccess', 'title')}</h2>
       </div>
 
       {/* Cards Grid */}

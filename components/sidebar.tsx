@@ -20,14 +20,15 @@ import {
   User,
   LogOut,
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const navigationItems = [
-  { name: "Home", href: "/", icon: Home },
-  { name: "Journal", href: "/journal", icon: BookOpen },
-  { name: "AI Chat", href: "/chat", icon: MessageCircle },
-  { name: "Health Advice", href: "/health-advice", icon: Heart },
-  { name: "Mental Peace", href: "/mental-peace", icon: Flower2 },
-  { name: "About", href: "/about", icon: Info },
+const navigationKeys = [
+  { key: "home", href: "/", icon: Home },
+  { key: "journal", href: "/journal", icon: BookOpen },
+  { key: "chat", href: "/chat", icon: MessageCircle },
+  { key: "healthAdvice", href: "/health-advice", icon: Heart },
+  { key: "mentalPeace", href: "/mental-peace", icon: Flower2 },
+  { key: "about", href: "/about", icon: Info },
 ];
 
 interface SidebarProps {
@@ -39,6 +40,7 @@ export default function Sidebar({ session }: SidebarProps) {
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const { t } = useLanguage();
 
   useEffect(() => {
     setMounted(true);
@@ -83,7 +85,7 @@ export default function Sidebar({ session }: SidebarProps) {
               <Smile className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-foreground">MindMate</h1>
+              <h1 className="text-lg font-bold text-foreground">{t("nav", "mindMate")}</h1>
               <p className="text-xs text-muted-foreground">Mental Wellness</p>
             </div>
           </Link>
@@ -92,9 +94,9 @@ export default function Sidebar({ session }: SidebarProps) {
         {/* Navigation */}
         <nav className="flex-1 space-y-1">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-2">
-            Navigation
+            {t("nav", "navigation")}
           </p>
-          {navigationItems.map((item) => {
+          {navigationKeys.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
             return (
@@ -116,7 +118,7 @@ export default function Sidebar({ session }: SidebarProps) {
                       : "text-muted-foreground"
                   }
                 />
-                <span>{item.name}</span>
+                <span>{t("nav", item.key)}</span>
               </Link>
             );
           })}
@@ -144,19 +146,17 @@ export default function Sidebar({ session }: SidebarProps) {
         {/* Bottom Actions */}
         <div className="mt-6 pt-6 border-t border-border space-y-1">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-2">
-            Preferences
+            {t("nav", "preferences")}
           </p>
 
-          <button
-            onClick={() => {
-              setIsOpen(false);
-              // Navigate to settings or open settings modal
-            }}
+          <Link
+            href="/settings"
+            onClick={() => setIsOpen(false)}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-accent transition-colors text-sm font-medium"
           >
             <Settings size={18} className="text-muted-foreground" />
-            <span>Settings</span>
-          </button>
+            <span>{t("nav", "settings")}</span>
+          </Link>
 
           <button
             onClick={() => {
@@ -177,7 +177,7 @@ export default function Sidebar({ session }: SidebarProps) {
               ) : (
                 <Sun size={18} className="text-muted-foreground" />
               )}
-              <span>Theme</span>
+              <span>{t("nav", "theme")}</span>
             </div>
             <span className="text-xs px-2 py-1 bg-secondary rounded-md text-muted-foreground capitalize">
               {theme}
@@ -194,7 +194,7 @@ export default function Sidebar({ session }: SidebarProps) {
               className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-destructive hover:bg-destructive/10 transition-colors text-sm font-medium mt-2"
             >
               <LogOut size={18} />
-              <span>Sign Out</span>
+              <span>{t("nav", "logout")}</span>
             </button>
           )}
         </div>

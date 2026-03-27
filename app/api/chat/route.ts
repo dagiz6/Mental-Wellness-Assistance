@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { prisma } from "@/lib/prisma";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "" });
 
 const CRISIS_KEYWORDS = [
   "suicide",
@@ -39,12 +39,14 @@ COMMUNICATION:
 
 async function detectLanguage(text: string): Promise<"am" | "en"> {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
     const prompt = `Identify if the following text is in Amharic or English. Reply with ONLY 'am' or 'en'.\n\nText: ${text}`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const lang = response.text().trim().toLowerCase();
+    const completion = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "llama-3.1-8b-instant",
+    });
+
+    const lang = completion.choices[0]?.message?.content?.trim().toLowerCase() || "en";
     return lang.includes("am") ? "am" : "en";
   } catch (error) {
     console.error("Language Detection Error:", error);
@@ -57,16 +59,20 @@ async function translateText(
   targetLang: "am" | "en",
 ): Promise<string> {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
     const systemPrompt =
       targetLang === "en"
         ? "Translate the following Amharic text to English. Maintain the emotional tone."
         : "Translate the following English text to Amharic. Maintain the emotional tone and use natural sounding Amharic (Geez script).";
 
-    const prompt = `${systemPrompt}\n\nText: ${text}`;
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return response.text().trim() || text;
+    const completion = await groq.chat.completions.create({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: text },
+      ],
+      model: "llama-3.1-8b-instant",
+    });
+
+    return completion.choices[0]?.message?.content?.trim() || text;
   } catch (error) {
     console.error("Translation Error:", error);
     return text;
@@ -139,13 +145,8 @@ export async function POST(req: Request) {
       processedMessage = await translateText(message, "en");
     }
 
-    // 4. Gemini Chat Completion
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash-lite",
-      systemInstruction: SYSTEM_PROMPT,
-    });
-
-    let history: { role: string; parts: { text: string }[] }[] = [];
+    // 4. Groq Chat Completion
+    const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
 
     if (sessionId) {
       const pastMessages = await prisma.chatMessage.findMany({
@@ -154,20 +155,23 @@ export async function POST(req: Request) {
         take: 10, // Fetch last 10 messages (5 exchanges)
       });
 
-      history = pastMessages.map((msg) => ({
-        role: msg.role === "assistant" ? "model" : "user",
-        parts: [{ text: msg.content }],
-      }));
+      for (const msg of pastMessages) {
+        messages.push({
+          role: msg.role === "assistant" ? "assistant" : "user",
+          content: msg.content,
+        });
+      }
     }
 
-    const chat = model.startChat({
-      history: history,
+    messages.push({ role: "user", content: processedMessage });
+
+    const completion = await groq.chat.completions.create({
+      messages: messages,
+      model: "llama-3.1-8b-instant",
     });
 
-    const result = await chat.sendMessage(processedMessage);
-    const response = await result.response;
     let assistantReply =
-      response.text() || "I'm sorry, I couldn't process that.";
+      completion.choices[0]?.message?.content || "I'm sorry, I couldn't process that.";
 
     // 5. Translate back if original was Amharic
     if (lang === "am") {

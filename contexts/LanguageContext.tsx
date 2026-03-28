@@ -125,6 +125,15 @@ export const translations = {
       cat_posture_title: "Posture",
       cat_posture_desc: "Exercises and tips for maintaining healthy posture.",
       cat_posture_advice: "Keep your shoulders relaxed, maintain neutral spine alignment, and take frequent breaks when sitting. Practice stretching and strengthening exercises daily to support good posture."
+    },
+    chatHistory: {
+      title: "Chat History",
+      description: "View and continue your past conversations with MindMate.",
+      noSessions: "No chat history found. Start a new conversation!",
+      newChat: "New Chat",
+      sessionLabel: "Session from",
+      viewChat: "View Chat",
+      loading: "Loading history..."
     }
   },
   am: {
@@ -245,6 +254,15 @@ export const translations = {
       cat_posture_title: "አቋም (Posture)",
       cat_posture_desc: "ጤናማ አቋምን ለመጠበቅ ልምምዶች እና ምክሮች።",
       cat_posture_advice: "ትከሻዎን ዘና ያድርጉ፣ ገለልተኛ የአከርካሪ አሰላለፍ ይጠብቁ እና ሲቀመጡ ተደጋጋሚ እረፍቶችን ይውሰዱ። ጥሩ አቋምን ለመደገፍ በየቀኑ የመለጠጥ እና የማጠናከሪያ እንቅስቃሴዎችን ይለማመዱ።"
+    },
+    chatHistory: {
+      title: "የውይይት ታሪክ",
+      description: "ከማይንድሜት ጋር ያደረጓቸውን የቀድሞ ውይይቶች ይመልከቱ እና ይቀጥሉ።",
+      noSessions: "ምንም የውይይት ታሪክ አልተገኘም። አዲስ ውይይት ይጀምሩ!",
+      newChat: "አዲስ ውይይት",
+      sessionLabel: "የውይይት ቀን",
+      viewChat: "ውይይቱን ይመልከቱ",
+      loading: "ታሪክ በመጫን ላይ..."
     }
   }
 };

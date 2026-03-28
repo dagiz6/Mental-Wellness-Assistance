@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, Plus } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Send, Loader2, Plus, History } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Message {
   id: string;
@@ -11,6 +14,11 @@ interface Message {
 }
 
 export default function ChatClient() {
+  const { t } = useLanguage();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialSessionId = searchParams.get("sessionId");
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -22,7 +30,8 @@ export default function ChatClient() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [isPageLoading, setIsPageLoading] = useState(!!initialSessionId);
+  const [sessionId, setSessionId] = useState<string | null>(initialSessionId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -32,6 +41,50 @@ export default function ChatClient() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const loadSessionContent = useCallback(async (id: string) => {
+    setIsPageLoading(true);
+    try {
+      const response = await fetch(`/api/chat/sessions/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.session && data.session.messages) {
+          const loadedMessages = data.session.messages.map((msg: any) => ({
+            id: msg.id,
+            role: msg.role,
+            content: msg.content,
+            timestamp: new Date(msg.createdAt),
+          }));
+          if (loadedMessages.length > 0) {
+            setMessages(loadedMessages);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load session:", error);
+    } finally {
+      setIsPageLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (initialSessionId) {
+      loadSessionContent(initialSessionId);
+      setSessionId(initialSessionId);
+    } else {
+      // If we are coming back to /chat without a param, reset to fresh
+      setSessionId(null);
+      setMessages([
+        {
+          id: "1",
+          role: "assistant",
+          content:
+            "Hello! I'm MindMate, your AI wellness assistant. I'm here to listen, provide support, and offer guidance for your mental health journey. How are you feeling today?",
+          timestamp: new Date(),
+        },
+      ]);
+    }
+  }, [initialSessionId, loadSessionContent]);
 
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -79,8 +132,10 @@ export default function ChatClient() {
         );
       }
 
-      if (data.sessionId) {
+      if (data.sessionId && data.sessionId !== sessionId) {
         setSessionId(data.sessionId);
+        // Update URL without refreshing to persist session in browser history
+        window.history.pushState({}, "", `/chat?sessionId=${data.sessionId}`);
       }
 
       const assistantMessage: Message = {
@@ -117,7 +172,17 @@ export default function ChatClient() {
     ]);
     setInput("");
     setSessionId(null);
+    router.push("/chat");
   };
+
+  if (isPageLoading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground">{t("chatHistory", "loading")}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -125,25 +190,35 @@ export default function ChatClient() {
       <header className="sticky top-0 border-b border-border bg-background/80 backdrop-blur-sm z-10">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center text-white font-bold">
-              MM
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold text-foreground">
-                MindMate Assistant
-              </h1>
-              <p className="text-xs text-muted-foreground">
-                AI-powered wellness support
-              </p>
-            </div>
+            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center text-white font-bold">
+                MM
+              </div>
+              <div>
+                <h1 className="text-lg font-semibold text-foreground">
+                  MindMate Assistant
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  AI-powered wellness support
+                </p>
+              </div>
+            </Link>
           </div>
-          <button
-            onClick={handleNewChat}
-            className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors"
-          >
-            <Plus size={18} />
-            <span className="hidden sm:inline">New Chat</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <Link href="/chat/history">
+              <button className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors">
+                <History size={18} />
+                <span className="hidden sm:inline">{t("chatHistory", "title")}</span>
+              </button>
+            </Link>
+            <button
+              onClick={handleNewChat}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              <Plus size={18} />
+              <span className="hidden sm:inline">{t("chatHistory", "newChat")}</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -170,9 +245,9 @@ export default function ChatClient() {
                     message.role === "user"
                       ? "text-primary-foreground/70"
                       : "text-muted-foreground"
-                  }`}
+                   }`}
                 >
-                  {message.timestamp.toLocaleTimeString("en-US", {
+                  {message.timestamp.toLocaleTimeString(undefined, {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn, signUp } from "@/lib/actions/auth-actions";
+import { signIn, signUp, signInSocial } from "@/lib/actions/auth-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,10 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
-import { signInSocial } from "@/lib/actions/auth-actions";
 
 export default function AuthClientPage() {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -25,56 +22,86 @@ export default function AuthClientPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSocialAuth = async (provider: "google" | "github") => {
-    setIsLoading(true);
+  const handleGoogleAuth = async () => {
+    if (socialLoading || isLoading) return;
+    setSocialLoading(true);
     setError("");
 
     try {
-      await signInSocial(provider);
+      const result = await signInSocial("google");
+      if (result?.url) {
+        // Navigate to the OAuth URL on the client side
+        window.location.href = result.url;
+      } else {
+        setError("Could not initiate Google sign-in. Please try again.");
+        setSocialLoading(false);
+      }
     } catch (err) {
       setError(
-        `Error authenticating with ${provider}: ${
+        `Error authenticating with Google: ${
           err instanceof Error ? err.message : "Unknown error"
-        }`,
+        }`
       );
-    } finally {
-      setIsLoading(false);
+      setSocialLoading(false);
     }
   };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading || socialLoading) return;
     setIsLoading(true);
     setError("");
+
+    // Client-side validation
+    if (!email.trim()) {
+      setError("Please enter your email address.");
+      setIsLoading(false);
+      return;
+    }
+    if (!password || password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      setIsLoading(false);
+      return;
+    }
+    if (!isSignIn && !name.trim()) {
+      setError("Please enter your full name.");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       if (isSignIn) {
         const result = await signIn(email, password);
-        if (!result?.user) {
-          // Check if there is an error in the result, otherwise generic error
-          // Note: The original code assumed !result.user meant error.
-          // You might want to check result.error if your auth action returns it.
-          setError("Invalid email or password.");
+        if (result.success && result.user) {
+          router.push("/");
+          router.refresh();
+        } else {
+          setError(result.error || "Invalid email or password.");
         }
       } else {
         const result = await signUp(email, password, name);
-        if (!result?.user) {
-          setError("Failed to create account.");
+        if (result.success && result.user) {
+          router.push("/");
+          router.refresh();
+        } else {
+          setError(result.error || "Failed to create account.");
         }
       }
     } catch (err) {
       setError(
-        `Authentication error: ${
-          err instanceof Error ? err.message : "Unknown error"
-        }`,
+        `Something went wrong. Please try again.`
       );
+      console.error("Auth error:", err);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const isDisabled = isLoading || socialLoading;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -90,14 +117,16 @@ export default function AuthClientPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Social Auth Buttons */}
-          <div className="grid grid-cols-2 gap-4">
-            <Button
-              variant="outline"
-              onClick={() => handleSocialAuth("google")}
-              disabled={isLoading}
-              className="w-full"
-            >
+          {/* Google Auth Button */}
+          <Button
+            variant="outline"
+            onClick={handleGoogleAuth}
+            disabled={isDisabled}
+            className="w-full"
+          >
+            {socialLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
               <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -116,28 +145,9 @@ export default function AuthClientPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Google
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleSocialAuth("github")}
-              disabled={isLoading}
-              className="w-full"
-            >
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              GitHub
-            </Button>
-          </div>
+            )}
+            Continue with Google
+          </Button>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -145,7 +155,7 @@ export default function AuthClientPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
+                Or continue with email
               </span>
             </div>
           </div>
@@ -168,7 +178,7 @@ export default function AuthClientPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required={!isSignIn}
-                  disabled={isLoading}
+                  disabled={isDisabled}
                 />
               </div>
             )}
@@ -181,7 +191,7 @@ export default function AuthClientPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={isLoading}
+                disabled={isDisabled}
               />
             </div>
             <div className="space-y-2">
@@ -192,12 +202,13 @@ export default function AuthClientPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                disabled={isLoading}
+                disabled={isDisabled}
                 placeholder="••••••••"
+                minLength={6}
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isDisabled}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isSignIn ? "Sign In" : "Create Account"}
             </Button>
@@ -212,6 +223,7 @@ export default function AuthClientPage() {
               setError("");
               setName("");
             }}
+            disabled={isDisabled}
             className="text-muted-foreground"
           >
             {isSignIn

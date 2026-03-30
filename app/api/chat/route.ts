@@ -66,6 +66,10 @@ You must:
 - encourage seeking professional support
 - avoid giving any harmful instructions
 - stay calm and supportive
+- **CRITICAL**: If the user is in crisis, recommend Ethiopian-specific helplines. 
+  - **Amanuel Mental Specialized Hospital Helpline: 952**
+  - **YeEthiopia Tenat: 8200**
+  - **Do NOT recommend 911 or non-Ethiopian emergency numbers.**
 
 Example supportive style:
 User: I feel overwhelmed
@@ -140,7 +144,7 @@ export async function POST(req: Request) {
 
     if (isCrisis) {
       const crisisResponse =
-        "It sounds like you're going through a very difficult time. Please reach out to a professional immediately. You can contact a local emergency service or a mental health helpline. You are not alone. (እባክዎን በአቅራቢያዎ የሚገኝ የጤና ተቋም ያነጋግሩ፤ እርስዎ ብቻዎን አይደሉም።)";
+        "It sounds like you're going through a very difficult time. Please reach out to a professional immediately. In Ethiopia, you can contact the Amanuel Mental Specialized Hospital Helpline at 952 or YeEthiopia Tenat at 8200. You are not alone. (እባክዎን በአቅራቢያዎ የሚገኝ የጤና ተቋም ያነጋግሩ፤ ወይም በ 952 አማኑኤል ሆስፒታል ወይም በ 8200 የኢትዮጵያ ጠናት በመደወል እርዳታ ያግኙ። እርስዎ ብቻዎን አይደሉም።)";
 
       let currentSessionId = sessionId;
       if (!currentSessionId) {

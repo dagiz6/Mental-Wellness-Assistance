@@ -78,7 +78,7 @@ export const translations = {
       step4Title: "Receive Daily Tips",
       step4Desc: "Get personalized wellness suggestions based on your mood patterns and journal content.",
       commitmentTitle: "Privacy Commitment",
-      commitmentDesc: "Your mental wellness journey is deeply personal. We're committed to protecting your privacy and ensuring your data remains yours alone—always stored locally, never shared, and completely secure."
+      commitmentDesc: "Your mental wellness journey is deeply personal. We're committed to protecting your privacy and ensuring your data remains yours alone, never shared, and completely secure."
     },
     mentalPeace: {
       title: "Mental Peace",

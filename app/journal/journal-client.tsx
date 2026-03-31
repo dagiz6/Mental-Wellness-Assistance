@@ -1,9 +1,21 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { BookOpen, Save, Sparkles, Calendar, Trash2 } from "lucide-react";
-import { createJournalEntry } from "@/lib/actions/journal-actions";
+import { createJournalEntry, deleteJournalEntry } from "@/lib/actions/journal-actions";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { buttonVariants } from "@/components/ui/button";
 
 type JournalEntry = {
   id: string;
@@ -23,6 +35,16 @@ export default function JournalPage({
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Sync entries state with initialEntries prop when it changes (e.g. after revalidatePath)
+  useEffect(() => {
+    setEntries(initialEntries);
+  }, [initialEntries]);
 
   const handleSaveEntry = async () => {
     if (!title.trim() || !content.trim()) {
@@ -44,6 +66,8 @@ export default function JournalPage({
     setTitle("");
     setContent("");
 
+    const previousEntries = [...entries];
+
     startTransition(async () => {
       try {
         await createJournalEntry({ title, content });
@@ -51,10 +75,30 @@ export default function JournalPage({
         // The page will revalidate and show the real entry
       } catch (error) {
         // Rollback optimistic update
-        setEntries(entries);
+        setEntries(previousEntries);
         setTitle(title);
         setContent(content);
         toast.error("Failed to save entry. Please try again.");
+      }
+    });
+  };
+
+  const handleDeleteEntry = async (id: string) => {
+    const entryToDelete = entries.find((e) => e.id === id);
+    if (!entryToDelete) return;
+
+    // Optimistic update
+    const previousEntries = [...entries];
+    setEntries(entries.filter((e) => e.id !== id));
+
+    startTransition(async () => {
+      try {
+        await deleteJournalEntry(id);
+        toast.success("Entry deleted successfully");
+      } catch (error) {
+        // Rollback
+        setEntries(previousEntries);
+        toast.error("Failed to delete entry. Please try again.");
       }
     });
   };
@@ -172,8 +216,46 @@ export default function JournalPage({
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-muted-foreground flex items-center gap-1">
                             <Calendar size={14} />
-                            {formatDate(entry.createdAt)}
+                            {mounted ? formatDate(entry.createdAt) : "Loading date..."}
                           </span>
+                          {mounted ? (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors z-10"
+                                  title="Delete entry"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete your
+                                    journal entry.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeleteEntry(entry.id)}
+                                    className={buttonVariants({ variant: "destructive" })}
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          ) : (
+                            <button
+                              disabled
+                              className="p-1.5 text-muted-foreground/30 rounded-md transition-colors z-10"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
                         </div>
                       </div>
                       <p className="text-foreground/70 line-clamp-2 leading-relaxed">

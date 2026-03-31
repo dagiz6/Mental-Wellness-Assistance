@@ -54,3 +54,28 @@ export async function getJournalEntries() {
 
   return entries;
 }
+
+export async function deleteJournalEntry(id: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  // Verify the entry belongs to the user
+  const entry = await prisma.journalEntry.findUnique({
+    where: { id },
+  });
+
+  if (!entry || entry.userId !== session.user.id) {
+    throw new Error("Entry not found or unauthorized");
+  }
+
+  await prisma.journalEntry.delete({
+    where: { id },
+  });
+
+  revalidatePath("/journal");
+}

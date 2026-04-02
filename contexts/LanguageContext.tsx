@@ -59,7 +59,7 @@ export const translations = {
     },
     about: {
       title: "About MindMate",
-      intro: "MindMate — is your personal sanctuary for mental clarity and emotional well-being. Inspired by ancient concepts of balance and modern intelligence, MindMate blends the wisdom of mindful living with the power of advanced AI.",
+      intro: "MindMate is your personal sanctuary for mental clarity and emotional well-being. Inspired by ancient concepts of balance and modern intelligence, MindMate blends the wisdom of mindful living with the power of advanced AI.",
       missionTitle: "Our Mission",
       mission1: "Our mission is simple: To provide a private, intelligent, and comforting space for daily self-care, reflection, and emotional support — without judgment, tracking, or cloud storage.",
       mission2: "Whether you're journaling your thoughts, checking in on your mood, or seeking health and wellness tips, MindMate is designed to meet you with calm, insight, and compassion — every single day.",

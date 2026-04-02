@@ -4,6 +4,8 @@ import DailyInsightCard from '@/components/daily-insight-card';
 import QuickAccessSection from '@/components/quick-access-section';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+import RecentActivity from '@/components/recent-activity';
+
 export default function Home() {
   const { t } = useLanguage();
 
@@ -31,9 +33,7 @@ export default function Home() {
               <div className="w-1 h-6 bg-primary rounded"></div>
               <h2 className="text-2xl font-semibold text-foreground">{t('home', 'recentActivity')}</h2>
             </div>
-            <div className="bg-card border border-border rounded-xl p-8 text-center text-muted-foreground">
-              <p>{t('home', 'noActivity')}</p>
-            </div>
+            <RecentActivity />
           </section>
         </div>
       </section>

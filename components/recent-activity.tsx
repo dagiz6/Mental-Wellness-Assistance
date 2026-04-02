@@ -54,9 +54,9 @@ export default function RecentActivity() {
           className="group block bg-card hover:bg-accent/50 border border-border rounded-xl p-4 transition-all duration-200"
         >
           <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-lg ${
+              <div className={`p-3 rounded-lg ${
               activity.type === "journal" 
-                ? "bg-blue-500/10 text-blue-500" 
+                ? "bg-primary/10 text-primary" 
                 : "bg-purple-500/10 text-purple-500"
             }`}>
               {activity.type === "journal" ? (

@@ -21,8 +21,8 @@ export default function QuickAccessSection() {
       description: t('quickAccess', 'chatDesc'),
       href: '/chat',
       icon: MessageCircle,
-      bgColor: 'from-blue-500/20 to-blue-600/20',
-      iconColor: '#3b82f6',
+      bgColor: 'from-primary/20 to-primary/30',
+      iconColor: 'var(--primary)',
     },
     {
       title: t('quickAccess', 'peaceTitle'),

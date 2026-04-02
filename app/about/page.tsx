@@ -101,7 +101,7 @@ export default function About() {
 
               {/* Step 2 */}
               <div className="flex gap-6">
-                <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-lg bg-blue-500/20 text-blue-400 font-bold text-lg">
+                <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-lg bg-primary/20 text-primary font-bold text-lg">
                   2
                 </div>
                 <div>

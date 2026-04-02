@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 const peaceTechniques = [
   { id: 'mindfulness', icon: <Brain size={20} className="text-purple-400" /> },
-  { id: 'stress', icon: <BarChart3 size={20} className="text-blue-400" /> },
+  { id: 'stress', icon: <BarChart3 size={20} className="text-primary" /> },
   { id: 'breathing', icon: <Wind size={20} className="text-cyan-400" /> },
   { id: 'affirmations', icon: <Lightbulb size={20} className="text-yellow-400" /> },
   { id: 'meditation', icon: <Flower2 size={20} className="text-indigo-400" /> },
@@ -64,7 +64,7 @@ export default function MentalPeacePage() {
           {/* Header */}
           <div className="mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6 text-balance flex items-center gap-3">
-              <Flower2 size={40} className="text-blue-400" />
+              <Flower2 size={40} className="text-primary" />
               {t('mentalPeace', 'title')}
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
@@ -136,7 +136,7 @@ export default function MentalPeacePage() {
 
           {/* Disclaimer */}
           <div className="flex items-center justify-center gap-2 text-muted-foreground text-center pt-8 border-t border-border">
-            <Flower2 size={18} className="text-blue-400 flex-shrink-0" />
+            <Flower2 size={18} className="text-primary flex-shrink-0" />
             <p>{t('mentalPeace', 'disclaimer')}</p>
           </div>
         </div>

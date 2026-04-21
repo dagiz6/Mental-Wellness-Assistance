@@ -127,13 +127,14 @@ export const translations = {
       cat_posture_advice: "Keep your shoulders relaxed, maintain neutral spine alignment, and take frequent breaks when sitting. Practice stretching and strengthening exercises daily to support good posture."
     },
     chatHistory: {
-      title: "Chat History",
-      description: "View and continue your past conversations with MindMate.",
-      noSessions: "No chat history found. Start a new conversation!",
-      newChat: "New Chat",
-      sessionLabel: "Session from",
-      viewChat: "View Chat",
       loading: "Loading history..."
+    },
+    chat: {
+      initialGreeting: "Hello! I'm MindMate, your AI wellness assistant. I'm here to listen, provide support, and offer guidance for your mental health journey. How are you feeling today?",
+      thinking: "MindMate is thinking...",
+      placeholder: "Type your message... (Shift + Enter for new line)",
+      privacyNotice: "Your conversations are private and stored securely",
+      disclaimer: "MindMate can make mistakes. Always consult a healthcare professional for medical advice."
     }
   },
   am: {
@@ -256,13 +257,14 @@ export const translations = {
       cat_posture_advice: "ትከሻዎን ዘና ያድርጉ፣ ገለልተኛ የአከርካሪ አሰላለፍ ይጠብቁ እና ሲቀመጡ ተደጋጋሚ እረፍቶችን ይውሰዱ። ጥሩ አቋምን ለመደገፍ በየቀኑ የመለጠጥ እና የማጠናከሪያ እንቅስቃሴዎችን ይለማመዱ።"
     },
     chatHistory: {
-      title: "የውይይት ታሪክ",
-      description: "ከማይንድሜት ጋር ያደረጓቸውን የቀድሞ ውይይቶች ይመልከቱ እና ይቀጥሉ።",
-      noSessions: "ምንም የውይይት ታሪክ አልተገኘም። አዲስ ውይይት ይጀምሩ!",
-      newChat: "አዲስ ውይይት",
-      sessionLabel: "የውይይት ቀን",
-      viewChat: "ውይይቱን ይመልከቱ",
       loading: "ታሪክ በመጫን ላይ..."
+    },
+    chat: {
+      initialGreeting: "ሰላም! እኔ ማይንድሜት ነኝ፣ የእርስዎ የአይአይ የጤንነት ረዳት። እኔ እዚህ ያለሁት የእርስዎን የአእምሮ ጤና ጉዞ ለመስማት፣ ድጋፍ ለመስጠት እና መመሪያ ለመስጠት ነው። ዛሬ እንዴት ነዎት?",
+      thinking: "ማይንድሜት በማሰብ ላይ ነው...",
+      placeholder: "መልእክትዎን እዚህ ይጻፉ... (ለአዲስ መስመር Shift + Enter)",
+      privacyNotice: "የእርስዎ ንግግሮች ግላዊ ናቸው እና ደህንነታቸው በተጠበቀ ሁኔታ ተቀምጠዋል",
+      disclaimer: "ማይንድሜት ስህተት ሊሠራ ይችላል። ሁልጊዜ ለሕክምና ምክር የጤና ባለሙያ ያማክሩ።"
     }
   }
 };

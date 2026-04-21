@@ -23,8 +23,7 @@ export default function ChatClient() {
     {
       id: "1",
       role: "assistant",
-      content:
-        "Hello! I'm MindMate, your AI wellness assistant. I'm here to listen, provide support, and offer guidance for your mental health journey. How are you feeling today?",
+      content: t("chat", "initialGreeting"),
       timestamp: new Date(),
     },
   ]);
@@ -78,8 +77,7 @@ export default function ChatClient() {
         {
           id: "1",
           role: "assistant",
-          content:
-            "Hello! I'm MindMate, your AI wellness assistant. I'm here to listen, provide support, and offer guidance for your mental health journey. How are you feeling today?",
+          content: t("chat", "initialGreeting"),
           timestamp: new Date(),
         },
       ]);
@@ -165,8 +163,7 @@ export default function ChatClient() {
       {
         id: "1",
         role: "assistant",
-        content:
-          "Hello! I'm MindMate, your AI wellness assistant. I'm here to listen, provide support, and offer guidance for your mental health journey. How are you feeling today?",
+        content: t("chat", "initialGreeting"),
         timestamp: new Date(),
       },
     ]);
@@ -208,7 +205,7 @@ export default function ChatClient() {
             <Link href="/chat/history">
               <button className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors">
                 <History size={18} />
-                <span className="hidden sm:inline">{t("chatHistory", "title")}</span>
+                <span className="hidden sm:inline">{t("chatHistory", "Chat History")}</span>
               </button>
             </Link>
             <button
@@ -216,7 +213,7 @@ export default function ChatClient() {
               className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
               <Plus size={18} />
-              <span className="hidden sm:inline">{t("chatHistory", "newChat")}</span>
+              <span className="hidden sm:inline">{t("chatHistory", "New Chat")}</span>
             </button>
           </div>
         </div>
@@ -262,7 +259,7 @@ export default function ChatClient() {
                 <div className="flex items-center gap-2">
                   <Loader2 className="animate-spin text-primary" size={18} />
                   <span className="text-sm text-muted-foreground">
-                    MindMate is thinking...
+                    {t("chat", "thinking")}
                   </span>
                 </div>
               </div>
@@ -285,7 +282,7 @@ export default function ChatClient() {
                 clipRule="evenodd"
               />
             </svg>
-            Your conversations are private and stored securely
+            {t("chat", "privacyNotice")}
           </div>
 
           {/* Input Form */}
@@ -297,7 +294,7 @@ export default function ChatClient() {
               onKeyPress={(e) =>
                 e.key === "Enter" && !e.shiftKey && handleSendMessage()
               }
-              placeholder="Type your message... (Shift + Enter for new line)"
+              placeholder={t("chat", "placeholder")}
               className="flex-1 bg-input border border-border rounded-2xl px-6 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
               disabled={isLoading}
             />
@@ -315,8 +312,7 @@ export default function ChatClient() {
           </div>
 
           <p className="text-xs text-muted-foreground text-center mt-3">
-            MindMate can make mistakes. Always consult a healthcare professional
-            for medical advice.
+            {t("chat", "disclaimer")}
           </p>
         </div>
       </footer>

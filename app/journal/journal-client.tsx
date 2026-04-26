@@ -2,8 +2,10 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { BookOpen, Save, Sparkles, Calendar, Trash2 } from "lucide-react";
-import { createJournalEntry, deleteJournalEntry } from "@/lib/actions/journal-actions";
+import { createJournalEntry, deleteJournalEntry, analyzeJournal } from "@/lib/actions/journal-actions";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Loader2, Brain } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,7 +37,10 @@ export default function JournalPage({
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysis, setAnalysis] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     setMounted(true);
@@ -81,6 +86,27 @@ export default function JournalPage({
         toast.error("Failed to save entry. Please try again.");
       }
     });
+  };
+
+  const handleAnalyze = async () => {
+    if (!content.trim()) {
+      toast.error("Please write something before analyzing");
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setAnalysis(null);
+
+    try {
+      const result = await analyzeJournal(content);
+      setAnalysis(result);
+      toast.success("Analysis complete!");
+    } catch (error) {
+      console.error("Analysis Error:", error);
+      toast.error("Failed to analyze content. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const handleDeleteEntry = async (id: string) => {
@@ -170,11 +196,46 @@ export default function JournalPage({
                   />
                   {isPending ? "Saving..." : "Save Entry"}
                 </button>
-                <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-medium">
-                  <Sparkles size={18} />
-                  Analyze with AI
+                <button
+                  onClick={handleAnalyze}
+                  disabled={isAnalyzing || !content.trim()}
+                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  {isAnalyzing ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <Sparkles size={18} />
+                  )}
+                  {isAnalyzing ? "Analyzing..." : "Analyze with AI"}
                 </button>
               </div>
+
+              {/* AI Analysis Result */}
+              {analysis && (
+                <div className="mt-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                  <div className="p-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl">
+                    <div className="bg-card/90 backdrop-blur-sm rounded-[10px] p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 bg-purple-500/10 rounded-lg">
+                          <Brain className="text-purple-500" size={20} />
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground">
+                          AI Insights & Advice
+                        </h3>
+                      </div>
+                      <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                        {analysis}
+                      </div>
+                      <button
+                        onClick={() => setAnalysis(null)}
+                        className="mt-4 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Dismiss analysis
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
